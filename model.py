@@ -29,6 +29,7 @@ class Position:
 class Zone:
 
     ZONES = []
+    EARTH_RADIUS_KILOMETERS = 6371
     MIN_LONGITUDE_DEGREES = -180
     MAX_LONGITUDE_DEGREES = 180
     MIN_LATITUDE_DEGREES = -90
@@ -88,6 +89,18 @@ class Zone:
     def population(self):
         return len(self.inhabitants)
 
+    @property
+    def width(self):
+        return abs(self.corner1.longitude - self.corner2.longitude) * self.EARTH_RADIUS_KILOMETERS
+
+    @property
+    def height(self):
+        return abs(self.corner1.latitude - self.corner2.latitude) * self.EARTH_RADIUS_KILOMETERS
+
+    @property
+    def area(self):
+        return self.height * self.width
+
 
 def main():
     for agent_attributes in json.load(open("agents-100k.json")):
@@ -101,7 +114,7 @@ def main():
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
         # Affichage de la population de la zone à laquelle appartient cet agent
-        print(zone.population)
+        print(zone.area)
 
 
 main()
