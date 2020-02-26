@@ -101,6 +101,11 @@ class Zone:
     def area(self):
         return self.height * self.width
 
+    def average_agreeableness(self):
+        if not self.inhabitants:
+            return 0
+        return sum([inhabitant.agreeableness for inhabitant in self.inhabitants]) / self.population
+
 
 def main():
     for agent_attributes in json.load(open("agents-100k.json")):
@@ -114,7 +119,7 @@ def main():
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
         # Affichage de la population de la zone à laquelle appartient cet agent
-        print(zone.area)
+        print(zone.average_agreeableness())
 
 
 main()
