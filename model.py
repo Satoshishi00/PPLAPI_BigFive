@@ -42,7 +42,7 @@ class Zone:
         self.inhabitants = []
 
     @classmethod
-    def initialize_zones(cls):
+    def _initialize_zones(cls):
         for latitude in range(cls.MIN_LATITUDE_DEGREES, cls.MAX_LATITUDE_DEGREES, cls.HEIGHT_DEGREES):
             for longitude in range(cls.MIN_LONGITUDE_DEGREES, cls.MAX_LONGITUDE_DEGREES, cls.WIDTH_DEGREES):
                 bottom_left_corner = Position(longitude, latitude)
@@ -63,6 +63,9 @@ class Zone:
     @classmethod
     # Retourne la zone à laquelle appartient une position
     def find_zone_that_contains(cls, position):
+        if not cls.ZONES:
+            # Initialisation de la grille et de ses zones
+            cls._initialize_zones()
         # Détermination de l'index de la zone à laquelle appartient une position
         longitude_index = int(
             (position.longitude_degrees - cls.MIN_LONGITUDE_DEGREES) / cls.WIDTH_DEGREES)
@@ -87,9 +90,6 @@ class Zone:
 
 
 def main():
-    # Création du plateau et des zones
-    Zone.initialize_zones()
-
     for agent_attributes in json.load(open("agents-100k.json")):
         # Détermination de la position de l'agent
         longitude = agent_attributes.pop("longitude")
