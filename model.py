@@ -149,7 +149,28 @@ class AgreeablenessGraph(BaseGraph):
         return x_values, y_values
 
 
+class IncomesGraph(BaseGraph):
+
+    def __init__(self):
+        super().__init__()
+        self.title = "Incomes in age"
+        self.x_label = "Age"
+        self.y_label = "Incomes"
+
+    def xy_values(self, zones):
+        x_values = zones[0]
+        y_values = zones[1]
+        return x_values, y_values
+
+
 def main():
+    # Initialisation des tableaux pour déterminer les revenus en fonction de l'age
+    age_numbers = []
+    sum_incomes = []
+    for i in range(0, 100):
+        age_numbers.append(0)
+        sum_incomes.append(0)
+
     for agent_attributes in json.load(open("agents-100k.json")):
         # Détermination de la position de l'agent
         longitude = agent_attributes.pop("longitude")
@@ -160,13 +181,29 @@ def main():
         # Enregistrement de l'agent dans la zone correspondant à sa position
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
-        # Affichage de la population de la zone à laquelle appartient cet agent
-        # print(zone.average_agreeableness())
+
+        # Récupération du nombre de personne et des revenus
+        age_numbers[agent.age] += 1
+        sum_incomes[agent.age] += agent.income
 
     # Graph initialization
     agreeableness_graph = AgreeablenessGraph()
     # Show graph
     agreeableness_graph.show(Zone.ZONES)
+
+    # Récupération de l'age et des revenus moyens
+    age = []
+    incomes = []
+    for i in range(0, 100):
+        age.append(i)
+        # Pour éviter la division par 0
+        if age_numbers[i] == 0:
+            age_numbers[i] = 1
+        incomes.append(sum_incomes[i]/age_numbers[i])
+
+    # Affichage du graphique des revenus en fonction de l'age
+    incomes_graph = IncomesGraph()
+    incomes_graph.show([age, incomes])
 
 
 main()
