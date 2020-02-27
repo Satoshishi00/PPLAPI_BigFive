@@ -1,7 +1,8 @@
 # -*-coding:Latin-1 -*
 
-import json
 import math
+import json
+import matplotlib.pyplot as plt
 
 
 class Agent:
@@ -101,10 +102,51 @@ class Zone:
     def area(self):
         return self.height * self.width
 
+    def population_density(self):
+        return self.population / self.area
+
     def average_agreeableness(self):
         if not self.inhabitants:
             return 0
         return sum([inhabitant.agreeableness for inhabitant in self.inhabitants]) / self.population
+
+
+class BaseGraph:
+
+    def __init__(self):
+        self.title = "Title graph"
+        self.x_label = "X"
+        self.y_label = "Y"
+        self.show_grid = True
+
+    def show(self, zones):
+        x_values, y_values = self.xy_values(zones)
+        plt.plot(x_values, y_values, '.')
+        plt.xlabel(self.x_label)
+        plt.ylabel(self.y_label)
+        plt.title(self.title)
+        plt.grid(self.show_grid)
+        plt.show()
+
+    def xy_values(self, zones):
+        # Forcer la définition de la methode dans l'enfant (methode abstraite)
+        raise NotImplementedError
+
+# AgreeablenessGraph hérite de BaseGraph
+
+
+class AgreeablenessGraph(BaseGraph):
+
+    def __init__(self):
+        super().__init__()
+        self.title = "People agreebleness"
+        self.x_label = "population density"
+        self.y_label = "agreeableness"
+
+    def xy_values(self, zones):
+        x_values = [zone.population_density() for zone in zones]
+        y_values = [zone.average_agreeableness() for zone in zones]
+        return x_values, y_values
 
 
 def main():
@@ -119,7 +161,12 @@ def main():
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
         # Affichage de la population de la zone à laquelle appartient cet agent
-        print(zone.average_agreeableness())
+        # print(zone.average_agreeableness())
+
+    # Graph initialization
+    agreeableness_graph = AgreeablenessGraph()
+    # Show graph
+    agreeableness_graph.show(Zone.ZONES)
 
 
 main()
